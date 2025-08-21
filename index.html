@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GAME</title>
+  <style>
+    :root { --bg:#0f1115; --card:#171923; --text:#e6e6e6; --muted:#9aa3b2; --accent:#5ee3a1; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: radial-gradient(1200px 800px at 80% -10%, #1d2130, #0f1115); color:var(--text); }
+    header { padding:48px 20px 24px; text-align:center; }
+    h1 { margin:0 0 8px; font-size: clamp(28px, 4vw, 40px); letter-spacing:.4px; }
+    p.subtitle { margin:0; color:var(--muted); }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px; padding:24px 20px 48px; max-width:1000px; margin:0 auto; }
+    .card { background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:18px; transition: transform .15s ease, box-shadow .15s ease, border-color .2s; }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,.35); border-color: rgba(255,255,255,.16); }
+    .card h3 { margin:6px 0 8px; font-size:18px; }
+    .card p { margin:0 0 12px; color:var(--muted); font-size:14px; line-height:1.4; min-height:2.8em;}
+    .btn { display:inline-block; padding:10px 14px; border-radius:12px; background:var(--card); border:1px solid rgba(255,255,255,.12); color:var(--text); text-decoration:none; font-weight:600; }
+    .btn:hover { border-color:var(--accent); box-shadow:0 0 0 3px rgba(94,227,161,.15) inset; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; padding:2px 6px; border-radius:8px; border:1px solid rgba(255,255,255,.14); background:#121521; color:var(--muted);}
+    footer { text-align:center; color:var(--muted); padding:18px; font-size:13px; border-top:1px solid rgba(255,255,255,.06); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>UNBLOCKED GAMES</h1>
+  </header>
+
+  <main class="grid">
+    <article class="card">
+      <h3>Snake</h3>
+      <p>Eat apples, grow longer, and avoid hitting yourself or the walls.</p>
+      <div class="row"><a class="btn" href="games/snake.html">Play</a> <span class="kbd">Arrow Keys</span> <span class="kbd">R = Restart</span></div>
+    </article>
+
+    <article class="card">
+      <h3>Pong</h3>
+      <p>You control the left paddle. The right paddle is the CPU.</p>
+      <div class="row"><a class="btn" href="games/pong.html">Play</a> <span class="kbd">W / S</span></div>
+    </article>
+
+    <article class="card">
+      <h3>Flappy</h3>
+      <p>Tap or press space to flap through the pipes.</p>
+      <div class="row"><a class="btn" href="games/flappy.html">Play</a> <span class="kbd">Click / Space</span></div>
+    </article>
+  </main>
+
+  <footer>
+    Visitors: <span id="visitor-count">...</span>
+  </footer>
+
+  <script>
+    fetch('https://api.countapi.xyz/hit/miniarcade/school')
+      .then(res => res.json())
+      .then(res => {
+        document.getElementById('visitor-count').textContent = res.value;
+      });
+  </script>
+</body>
+</html>
