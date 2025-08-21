@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dino Game</title>
+<style>
+  body { margin:0; background:#0f1115; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; }
+  #game { position:relative; width:800px; height:200px; border:2px solid #fff; overflow:hidden; }
+  #dino { width:40px; height:40px; background:#5ee3a1; position:absolute; bottom:0; left:50px; }
+  .cactus { width:20px; height:40px; background:#e64c4c; position:absolute; bottom:0; right:0; animation:move 2s linear infinite; }
+  @keyframes move { from { right:-20px; } to { right:800px; } }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="dino"></div>
+</div>
+
+<script>
+const dino = document.getElementById('dino');
+const game = document.getElementById('game');
+let jumping = false;
+
+function jump() {
+  if (jumping) return;
+  jumping = true;
+  let up = 0;
+  const upInterval = setInterval(() => {
+    if (up >= 100) {
+      clearInterval(upInterval);
+      const downInterval = setInterval(() => {
+        if (up <= 0) {
+          clearInterval(downInterval);
+          jumping = false;
+        }
+        dino.style.bottom = (up -= 5) + 'px';
+      }, 20);
+    }
+    dino.style.bottom = (up += 5) + 'px';
+  }, 20);
+}
+
+document.addEventListener('keydown', e => { if (e.code === 'Space') jump(); });
+
+function createCactus() {
+  const cactus = document.createElement('div');
+  cactus.classList.add('cactus');
+  game.appendChild(cactus);
+
+  let cactusPos = 800;
+  const moveInterval = setInterval(() => {
+    cactusPos -= 5;
+    cactus.style.right = cactusPos + 'px';
+    if (cactusPos < 0) {
+      cactus.remove();
+      clearInterval(moveInterval);
+    }
+    // Collision detection
+    const dinoRect = dino.getBoundingClientRect();
+    const cactusRect = cactus.getBoundingClientRect();
+    if (
+      dinoRect.left < cactusRect.right &&
+      dinoRect.right > cactusRect.left &&
+      dinoRect.bottom > cactusRect.top
+    ) {
+      alert('Game Over!');
+      window.location.reload();
+    }
+  }, 20);
+
+  setTimeout(createCactus, Math.random() * 2000 + 1000);
+}
+
+createCactus();
+</script>
+</body>
+</html>
