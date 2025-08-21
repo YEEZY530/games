@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flappy</title>
+<style>
+  body { margin:0; background:#0f1115; color:#e6e6e6; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; display:grid; place-items:center; height:100vh; }
+  canvas { background:linear-gradient(#0b1220, #0f1115); border:1px solid #2a3142; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.35); }
+  .hint { margin-top:10px; color:#9aa3b2; font-size:14px; text-align:center; }
+</style>
+</head>
+<body>
+  <div>
+    <canvas id="c" width="400" height="560"></canvas>
+    <div class="hint">Click or press Space to flap. R to restart.</div>
+  </div>
+<script>
+const c = document.getElementById('c'), ctx = c.getContext('2d');
+const W=c.width, H=c.height;
+
+let bird, pipes, running, score, best=0, time, gravity=0.45, flap=-7;
+
+function reset(){
+  bird = { x: 90, y: H/2, vy: 0, r: 10 };
+  pipes = [];
+  running = true;
+  score = 0;
+  time = 0;
+}
+
+function spawnPipe(){
+  const gap = 120;
+  const topH = 50 + Math.random()*(H-200);
+  pipes.push({ x: W+40, top: topH, gap: gap, w: 50, passed:false });
+}
+
+function collide(b, p){
+  if(b.x+b.r < p.x || b.x-b.r > p.x+p.w) return false;
+  if(b.y-b.r > p.top && b.y+b.r < p.top+p.gap) return false;
+  return true;
+}
+
+function step(t){
+  if(!step.last) step.last=t;
+  const dt = Math.min(1/60, (t-step.last)/1000);
+  step.last=t;
+
+  if(running){
+    time += dt;
+    if(time>1.2){ spawnPipe(); time=0; }
+
+    bird.vy += gravity;
+    bird.y += bird.vy;
+
+    for(let p of pipes){
+      p.x -= 2.4;
+      if(!p.passed && p.x + p.w < bird.x - bird.r){
+        p.passed=true; score++; best=Math.max(best,score);
+      }
+      if(collide(bird,p)) running=false;
+    }
+    pipes = pipes.filter(p => p.x + p.w > -10);
+
+    if(bird.y - bird.r < 0 || bird.y + bird.r > H) running=false;
+  }
+
+  // draw
+  ctx.clearRect(0,0,W,H);
+
+  // ground line
+  ctx.strokeStyle = 'rgba(255,255,255,.1)';
+  ctx.beginPath(); ctx.moveTo(0,H-20); ctx.lineTo(W,H-20); ctx.stroke();
+
+  // pipes
+  for(let p of pipes){
+    ctx.fillStyle = '#3fbf88';
+    // top
+    ctx.fillRect(p.x, 0, p.w, p.top);
+    // bottom
+    ctx.fillRect(p.x, p.top + p.gap, p.w, H - (p.top + p.gap));
+  }
+
+  // bird
+  ctx.fillStyle = '#e6e6e6';
+  ctx.beginPath(); ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI*2); ctx.fill();
+  // eye
+  ctx.fillStyle = '#0b1220'; ctx.beginPath(); ctx.arc(bird.x+3, bird.y-3, 2, 0, Math.PI*2); ctx.fill();
+
+  // score
+  ctx.fillStyle='#e6e6e6'; ctx.font='bold 22px system-ui, sans-serif';
+  ctx.fillText(score, 12, 28);
+  ctx.font='12px ui-monospace, monospace';
+  ctx.fillText('Best: '+best, 12, 44);
+
+  if(!running){
+    ctx.fillStyle='rgba(0,0,0,.5)';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#e6e6e6';
+    ctx.font='bold 20px system-ui, sans-serif';
+    ctx.fillText('Game Over - R to restart', 70, H/2);
+  }
+
+  requestAnimationFrame(step);
+}
+
+addEventListener('mousedown', ()=>{ if(running){ bird.vy = flap; }});
+addEventListener('touchstart', (e)=>{ e.preventDefault(); if(running){ bird.vy = flap; }}, {passive:false});
+addEventListener('keydown', e=>{
+  if(e.key===' ') { if(running){ bird.vy = flap; } e.preventDefault(); }
+  if(e.key.toLowerCase()==='r'){ reset(); }
+}, {passive:false});
+
+reset();
+requestAnimationFrame(step);
+</script>
+</body>
+</html>
